@@ -17,6 +17,7 @@ namespace Soccer_Matches
 {
     public class Startup
     {
+        readonly string MyAllowSpecificOringins = "_myAllowSpecificOrigins";
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -27,11 +28,11 @@ namespace Soccer_Matches
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            /*services.AddSpaStaticFiles(Configuration =>
-            {
-                Configuration.RootPath = "ClientApp/dist";
-            });*/
-            //services.AddEntityFrameworkSqlServer();
+            services.AddCors(options => options.AddPolicy(name: MyAllowSpecificOringins,
+                builder =>
+                {
+                    builder.WithOrigins("https://localhost:3000").SetIsOriginAllowed((host)=>true).AllowAnyMethod().AllowAnyHeader();
+                }));
             services.AddControllers();
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             
@@ -50,6 +51,8 @@ namespace Soccer_Matches
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.UseCors(MyAllowSpecificOringins);
 
             app.UseEndpoints(endpoints =>
             {

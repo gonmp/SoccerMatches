@@ -42,15 +42,15 @@ namespace Soccer_Matches.Controllers
             return match;
         }
 
-        // GET: api/Matches/search/Barcelona
+        // GET: api/Matches/search?team=barcelona&pageSize=20&pageNumber=2
         [HttpGet("search")]
-        public async Task<ActionResult<IEnumerable<Match>>> GetMatches(string Team)
+        public async Task<ActionResult<IEnumerable<Match>>> GetMatches(string team, int pageSize, int pageNumber)
         {
             var matches = from m in _context.Matches select m;
 
-            if (!String.IsNullOrEmpty(Team))
+            if (!String.IsNullOrEmpty(team))
             {
-                matches = matches.Where(m => m.HomeTeam.Contains(Team) || m.AwayTeam.Contains(Team));
+                matches = matches.Where(m => m.HomeTeam.Contains(team) || m.AwayTeam.Contains(team)).Skip((pageNumber - 1) * pageSize).Take(pageSize);
             }
 
             return await matches.ToListAsync();
