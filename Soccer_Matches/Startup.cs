@@ -31,7 +31,7 @@ namespace Soccer_Matches
             services.AddCors(options => options.AddPolicy(name: MyAllowSpecificOringins,
                 builder =>
                 {
-                    builder.WithOrigins("https://localhost:3000").SetIsOriginAllowed((host)=>true).AllowAnyMethod().AllowAnyHeader();
+                    builder.WithOrigins("https://localhost:3000").SetIsOriginAllowed((host)=>true).AllowAnyMethod().AllowAnyHeader().WithExposedHeaders("X-Pagination");
                 }));
             services.AddControllers();
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));

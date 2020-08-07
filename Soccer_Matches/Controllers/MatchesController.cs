@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using Soccer_Matches.Data;
+using Soccer_Matches.Data.Helpers;
 using Soccer_Matches.Data.Models;
 
 namespace Soccer_Matches.Controllers
@@ -44,16 +46,31 @@ namespace Soccer_Matches.Controllers
 
         // GET: api/Matches/search?team=barcelona&pageSize=20&pageNumber=2
         [HttpGet("search")]
-        public async Task<ActionResult<IEnumerable<Match>>> GetMatches(string team, int pageSize, int pageNumber)
+        public async Task<ActionResult<PagedList<Match>>> GetMatches(string team, int pageSize, int pageNumber)
         {
             var matches = from m in _context.Matches select m;
 
             if (!String.IsNullOrEmpty(team))
             {
-                matches = matches.Where(m => m.HomeTeam.Contains(team) || m.AwayTeam.Contains(team)).Skip((pageNumber - 1) * pageSize).Take(pageSize);
+                matches = matches.Where(m => m.HomeTeam.Contains(team) || m.AwayTeam.Contains(team));
             }
 
-            return await matches.ToListAsync();
+            var pagedListMatches = PagedList<Match>.ToPagedList(matches, pageNumber, pageSize);
+
+            var metadata = new
+            {
+                pagedListMatches.TotalCount,
+                pagedListMatches.PageSize,
+                pagedListMatches.CurrentPage,
+                pagedListMatches.TotalPages,
+                pagedListMatches.HasPrevious,
+                pagedListMatches.HasNext
+            };
+
+            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
+
+
+            return pagedListMatches;
         }
 
         // PUT: api/Matches/5
