@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.Web.CodeGeneration.EntityFrameworkCore;
 using Soccer_Matches.Data;
 
 namespace Soccer_Matches
@@ -34,7 +35,7 @@ namespace Soccer_Matches
                     builder.WithOrigins("https://localhost:3000").SetIsOriginAllowed((host)=>true).AllowAnyMethod().AllowAnyHeader().WithExposedHeaders("X-Pagination");
                 }));
             services.AddControllers();
-            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString(Configuration["ConnectionString:DefaultConnection"])));
             
         }
 
